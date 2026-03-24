@@ -179,15 +179,19 @@
             margin:       [8, 8, 8, 8],
             filename:     'Madrasa_Admission_Form.pdf',
             image:        { type: 'jpeg', quality: 1.0 },
-            html2canvas:  { scale: 2.5, useCORS: true },
+            html2canvas:  { 
+                scale: 2, 
+                useCORS: true,
+                width: 794, // A4 size pixel width - ഇത് മൊബൈലിൽ പകുതിയാകുന്നത് തടയും
+                windowWidth: 794 // ബ്രൗസർ വിൻഡോ വീതി ഫിക്സ് ചെയ്യുന്നു
+            },
             jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
 
         html2pdf().set(opt).from(element).save().then(() => {
             element.style.display = 'none';
             
-            // വാട്സാപ്പ് സെറ്റിംഗ്സ്
-            const phoneNumber = "919895993822"; // നിങ്ങളുടെ നമ്പർ ഇവിടെ നൽകുക
+            const phoneNumber = "919895993822"; 
             const message = "അപേക്ഷാ ഫോറം പൂരിപ്പിച്ചിട്ടുണ്ട്. PDF താഴെ അയക്കുന്നു.";
             const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
             
