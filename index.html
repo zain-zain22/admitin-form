@@ -3,101 +3,190 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admission Form</title>
+    <title>Madrasa Admission Form</title>
     <link href="https://fonts.googleapis.com/css2?family=Manjari:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        body { font-family: 'Manjari', sans-serif; background-color: #f4f7f6; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .form-container { background: white; padding: 30px; border-radius: 15px; shadow: 0 4px 15px rgba(0,0,0,0.1); width: 90%; max-width: 400px; }
-        .step { display: none; }
-        .step.active { display: block; }
-        h2 { text-align: center; color: #1a5f7a; }
-        input { width: 100%; padding: 12px; margin: 15px 0; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
-        button { background-color: #28a745; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-size: 16px; width: 100%; font-weight: bold; }
+        body { font-family: 'Manjari', sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 10px; }
         
-        /* PDF-ൽ കാണാൻ വേണ്ടിയുള്ള സ്റ്റൈൽ */
-        #displayArea { display: none; padding: 20px; border: 2px solid #000; }
-        .pdf-row { margin-bottom: 15px; font-size: 18px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+        /* Mobile View Form */
+        .wizard-box { background: white; width: 100%; max-width: 500px; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); position: relative; overflow: hidden; }
+        .step { display: none; width: 100%; box-sizing: border-box; }
+        .step.active { display: block; animation: slideIn 0.4s ease-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } }
+        
+        h3 { color: #1b5e20; text-align: center; margin-top: 0; }
+        label { font-weight: bold; display: block; margin-top: 15px; color: #333; font-size: 14px; }
+        input, select, textarea { width: 100%; padding: 12px; margin-top: 5px; border: 2px solid #eee; border-radius: 8px; box-sizing: border-box; font-size: 16px; font-family: 'Manjari'; }
+        .btn-group { margin-top: 25px; display: flex; gap: 10px; }
+        .btn { flex: 1; padding: 15px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 16px; transition: 0.3s; }
+        .btn-next { background: #1b5e20; color: white; }
+        .btn-prev { background: #ccc; color: #333; }
+        .btn-submit { background: #e67e22; color: white; }
+
+        /* PDF Layout */
+        #pdf-content { 
+            display: none; 
+            width: 180mm; 
+            margin: 0 auto; 
+            padding: 10mm; 
+            background: white; 
+            border: 3px solid #000; 
+            box-sizing: border-box; 
+        }
+        .pdf-header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 15px; }
+        .sub-header { text-align: center; font-size: 16px; font-weight: bold; margin-bottom: 25px; }
+        
+        /* പ്രധാന മാറ്റം ഇവിടെയാണ് */
+        .pdf-row { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: flex-start; /* മുകളിൽ നിന്ന് തുടങ്ങാൻ */
+            margin-bottom: 12px; 
+            border-bottom: 1px dotted #000; 
+            padding-bottom: 4px; 
+            width: 100%;
+            flex-wrap: nowrap; /* വരികൾ മുറിയാതിരിക്കാൻ */
+        }
+        .pdf-label { 
+            font-weight: bold; 
+            font-size: 14px; 
+            width: 45%; /* ലേബലിന് കൃത്യമായ സ്ഥലം */
+            text-align: left; 
+            flex-shrink: 0;
+        }
+        .pdf-value { 
+            width: 53%; 
+            text-align: right; 
+            font-size: 15px; 
+            font-weight: bold; 
+            word-wrap: break-word; /* വാക്കുകൾ താഴേക്ക് വരാൻ */
+            overflow-wrap: break-word;
+            line-height: 1.4;
+        }
+        
+        .footer { margin-top: 30px; display: flex; justify-content: space-between; font-size: 14px; }
+        .office-box { margin-top: 30px; border: 2px solid #000; padding: 20px 15px; position: relative; }
     </style>
 </head>
 <body>
 
-<div class="form-container">
-    <div id="inputForm">
-        <h2>അഡ്മിഷൻ ഫോം</h2>
-
-        <div class="step active" id="step1">
-            <label>കുട്ടിയുടെ പേര്:</label>
-            <input type="text" id="studentName" placeholder="പേര് ടൈപ്പ് ചെയ്യുക">
-            <button onclick="nextStep(2)">Next</button>
-        </div>
-
-        <div class="step" id="step2">
-            <label>രക്ഷിതാവിന്റെ പേര്:</label>
-            <input type="text" id="parentName" placeholder="രക്ഷിതാവിന്റെ പേര്">
-            <button onclick="nextStep(3)">Next</button>
-        </div>
-
-        <div class="step" id="step3">
-            <label>ഫോൺ നമ്പർ:</label>
-            <input type="tel" id="phoneNumber" placeholder="ഫോൺ നമ്പർ">
-            <button id="finishBtn" onclick="generatePDF()">Submit & WhatsApp</button>
-        </div>
+<div class="wizard-box">
+    <h3>മദ്രസ അപേക്ഷാ ഫോറം</h3>
+    
+    <div class="step active" id="s1">
+        <label>1. കുട്ടിയുടെ പേരും ഇനീഷ്യലും (മലയാളം):</label>
+        <input type="text" id="in_name_ml">
+        <label>കുട്ടിയുടെ പേര് (English):</label>
+        <input type="text" id="in_name_en">
+        <label>2. ലിംഗം:</label>
+        <select id="in_gender"><option value="ആൺ">ആൺ</option><option value="പെൺ">പെൺ</option></select>
+        <div class="btn-group"><button class="btn btn-next" onclick="nextStep(2)">Next</button></div>
     </div>
 
-    <div id="displayArea">
-        <h2 style="text-align:center; color:#1a5f7a;">അഡ്മിഷൻ വിവരങ്ങൾ</h2>
-        <hr>
-        <div class="pdf-row"><b>കുട്ടിയുടെ പേര്:</b> <span id="pStudentName"></span></div>
-        <div class="pdf-row"><b>രക്ഷിതാവിന്റെ പേര്:</b> <span id="pParentName"></span></div>
-        <div class="pdf-row"><b>ഫോൺ നമ്പർ:</b> <span id="pPhoneNumber"></span></div>
-        <p style="text-align:center; font-size:12px; margin-top:50px;">ഈ ഫോം ഓൺലൈൻ വഴി പൂരിപ്പിച്ചതാണ്.</p>
+    <div class="step" id="s2">
+        <label>3. വീട്ടുപേര്:</label>
+        <input type="text" id="in_house">
+        <label>4. പിതാവിന്റെ/മാതാവിന്റെ പേര്:</label>
+        <input type="text" id="in_parent_main">
+        <div class="btn-group"><button class="btn btn-prev" onclick="prevStep(1)">Back</button><button class="btn btn-next" onclick="nextStep(3)">Next</button></div>
+    </div>
+
+    <div class="step" id="s3">
+        <label>5. രക്ഷിതാവിന്റെ പേരും വീട്ടുപേരും:</label>
+        <input type="text" id="in_guardian">
+        <label>6. രക്ഷിതാവിന്റെ ഫോൺ നമ്പർ:</label>
+        <input type="tel" id="in_phone">
+        <label>7. രക്ഷിതാവുമായുള്ള ബന്ധം:</label>
+        <input type="text" id="in_relation">
+        <div class="btn-group"><button class="btn btn-prev" onclick="prevStep(2)">Back</button><button class="btn btn-next" onclick="nextStep(4)">Next</button></div>
+    </div>
+
+    <div class="step" id="s4">
+        <label>8. രക്ഷിതാവിന്റെ ജോലിയും മേൽവിലാസവും:</label>
+        <textarea id="in_job_addr" rows="2"></textarea>
+        <label>9. ജനന തീയതി (അക്കത്തിൽ):</label>
+        <input type="date" id="in_dob_num">
+        <label>ജനന തീയതി (അക്ഷരത്തിൽ):</label>
+        <input type="text" id="in_dob_word">
+        <div class="btn-group"><button class="btn btn-prev" onclick="prevStep(3)">Back</button><button class="btn btn-next" onclick="nextStep(5)">Next</button></div>
+    </div>
+
+    <div class="step" id="s5">
+        <label>10. ചേർക്കേണ്ട ക്ലാസ്:</label>
+        <input type="text" id="in_class">
+        <label>11. തിരിച്ചറിയാനുള്ള അടയാളങ്ങൾ:</label>
+        <input type="text" id="in_marks">
+        <label>12. മുമ്പ് പഠിച്ച മദ്രസ വിവരങ്ങൾ:</label>
+        <textarea id="in_prev_madrasa" rows="2"></textarea>
+        <div class="btn-group"><button class="btn btn-prev" onclick="prevStep(4)">Back</button><button class="btn btn-submit" onclick="downloadPDF()">Submit & WhatsApp</button></div>
+    </div>
+</div>
+
+<div id="pdf-content">
+    <div class="pdf-header">
+        <h2>ഇസ്‌ലാമിക് എജ്യുക്കേഷൻ ബോർഡ്</h2>
+        <p>സമസ്ത കേരള സുന്നി വിദ്യാഭ്യാസ ബോർഡ്, കോഴിക്കോട് - 6</p>
+    </div>
+    <div class="sub-header">1566 ആം നമ്പർ അംഗീകൃത ഇൻഫത്തുൽ ഇസ്ലാം മദ്രസ്സ - പ്രവേശന അപേക്ഷ</div>
+
+    <div class="pdf-row"><span class="pdf-label">1. കുട്ടിയുടെ പേര് (ML):</span><span class="pdf-value" id="out_name_ml"></span></div>
+    <div class="pdf-row"><span class="pdf-label">കുട്ടിയുടെ പേര് (EN):</span><span class="pdf-value" id="out_name_en"></span></div>
+    <div class="pdf-row"><span class="pdf-label">2. ലിംഗം:</span><span class="pdf-value" id="out_gender"></span></div>
+    <div class="pdf-row"><span class="pdf-label">3. വീട്ടുപേര്:</span><span class="pdf-value" id="out_house"></span></div>
+    <div class="pdf-row"><span class="pdf-label">4. പിതാവ്/മാതാവ്:</span><span class="pdf-value" id="out_parent_main"></span></div>
+    <div class="pdf-row"><span class="pdf-label">5. രക്ഷിതാവ് & വീട്ടുപേര്:</span><span class="pdf-value" id="out_guardian"></span></div>
+    <div class="pdf-row"><span class="pdf-label">6. ഫോൺ നമ്പർ:</span><span class="pdf-value" id="out_phone"></span></div>
+    <div class="pdf-row"><span class="pdf-label">7. രക്ഷിതാവുമായുള്ള ബന്ധം:</span><span class="pdf-value" id="out_relation"></span></div>
+    <div class="pdf-row"><span class="pdf-label">8. ജോലി & മേൽവിലാസം:</span><span class="pdf-value" id="out_job_addr"></span></div>
+    <div class="pdf-row"><span class="pdf-label">9. ജനന തീയതി (അക്കത്തിൽ):</span><span class="pdf-value" id="out_dob_num"></span></div>
+    <div class="pdf-row"><span class="pdf-label">ജനന തീയതി (അക്ഷരത്തിൽ):</span><span class="pdf-value" id="out_dob_word"></span></div>
+    <div class="pdf-row"><span class="pdf-label">10. ചേർക്കേണ്ട ക്ലാസ്:</span><span class="pdf-value" id="out_class"></span></div>
+    <div class="pdf-row"><span class="pdf-label">11. തിരിച്ചറിയൽ അടയാളങ്ങൾ:</span><span class="pdf-value" id="out_marks"></span></div>
+    <div class="pdf-row"><span class="pdf-label">12. മുമ്പ് പഠിച്ച മദ്രസ വിവരങ്ങൾ:</span><span class="pdf-value" id="out_prev_madrasa"></span></div>
+
+    <div class="footer">
+        <div>സ്ഥലം: .....................<br>തീയതി: .....................</div>
+        <div style="text-align:right;">രക്ഷിതാവിന്റെ ഒപ്പ്: .....................</div>
+    </div>
+
+    <div class="office-box">
+        <div style="position:absolute; top:-10px; left:15px; background:white; padding:0 8px; font-weight:bold; font-size:14px;">ഓഫീസ് ഉപയോഗത്തിന്</div>
+        <div style="display:flex; justify-content:space-between; font-size:14px;">
+            <span>പ്രവേശന നമ്പർ: ...........</span><span>ചേർത്ത ക്ലാസ്: ...........</span><span>തീയതി: ...........</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-size:14px; margin-top:20px;">
+            <span>സദർ മുഅല്ലിമിന്റെ പേര്: ........................</span><span>ഒപ്പ്: ........................</span>
+        </div>
     </div>
 </div>
 
 <script>
-    function nextStep(step) {
-        const current = document.querySelector('.step.active');
-        const input = current.querySelector('input');
-        if (input.value.trim() === "") { alert("ദയവായി പൂരിപ്പിക്കുക"); return; }
-        
-        current.classList.remove('active');
-        document.getElementById('step' + step).classList.add('active');
-    }
+    function nextStep(n) { document.querySelector('.step.active').classList.remove('active'); document.getElementById('s'+n).classList.add('active'); }
+    function prevStep(n) { document.querySelector('.step.active').classList.remove('active'); document.getElementById('s'+n).classList.add('active'); }
 
-    function generatePDF() {
-        const sName = document.getElementById('studentName').value;
-        const pName = document.getElementById('parentName').value;
-        const phone = document.getElementById('phoneNumber').value;
+    function downloadPDF() {
+        const ids = ['name_ml','name_en','gender','house','parent_main','guardian','phone','relation','job_addr','dob_num','dob_word','class','marks','prev_madrasa'];
+        ids.forEach(id => {
+            const val = document.getElementById('in_'+id).value;
+            document.getElementById('out_'+id).innerText = val ? val : " ";
+        });
 
-        if (phone.trim() === "") { alert("ഫോൺ നമ്പർ നൽകുക"); return; }
-
-        // ഇൻപുട്ട് വാല്യൂസ് PDF ഏരിയയിലേക്ക് മാറ്റുന്നു
-        document.getElementById('pStudentName').innerText = sName;
-        document.getElementById('pParentName').innerText = pName;
-        document.getElementById('pPhoneNumber').innerText = phone;
-
-        // PDF എടുക്കേണ്ട ഭാഗം കാണിക്കുന്നു
-        const element = document.getElementById('displayArea');
+        const element = document.getElementById('pdf-content');
         element.style.display = 'block';
-
+        
         const opt = {
-            margin: 15,
-            filename: sName + '_Admission.pdf',
-            html2canvas: { scale: 2, useCORS: true },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            margin:       [10, 10, 10, 10],
+            filename:     'Admission_Form.pdf',
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2, useCORS: true },
+            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
 
         html2pdf().set(opt).from(element).save().then(() => {
-            element.style.display = 'none'; // PDF എടുത്തു കഴിഞ്ഞാൽ വീണ്ടും മറയ്ക്കുന്നു
-            
-            // വാട്സാപ്പിലേക്ക്
-            const myNumber = "919895993822"; // നിങ്ങളുടെ നമ്പർ ഇവിടെ മാറ്റുക
-            const msg = " അഡ്മിഷൻ ഫോം പൂരിപ്പിച്ചിട്ടുണ്ട്. PDF താഴെ അയക്കുന്നു.";
-            window.location.href = `https://wa.me/${myNumber}?text=${encodeURIComponent(msg)}`;
+            element.style.display = 'none';
         });
     }
 </script>
-
 </body>
 </html>
