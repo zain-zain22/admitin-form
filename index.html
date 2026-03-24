@@ -27,7 +27,7 @@
         /* PDF Styling - Optimized for A4 Centering */
         #pdf-content { 
             display: none; 
-            width: 145mm; 
+            width: 185mm; 
             margin: 0 auto; 
             padding: 10mm; 
             background: white; 
@@ -165,7 +165,43 @@
         document.getElementById('s'+n).classList.add('active'); 
     }
 
-    വീതി അല്ല hight ആണ് താഴെ പോയത് 
+    function downloadPDF() {
+    const ids = ['name_ml','name_en','gender','house','parent_main','guardian','phone','relation','job_addr','dob_num','dob_word','class','marks','prev_madrasa'];
+    ids.forEach(id => {
+        const inputElem = document.getElementById('in_'+id);
+        const outputElem = document.getElementById('out_'+id);
+        if(inputElem && outputElem) {
+            outputElem.innerText = inputElem.value ? inputElem.value : " ";
+        }
+    });
+
+    const element = document.getElementById('pdf-content');
+    element.style.display = 'block';
+    
+    const opt = {
+        margin: [8, 8, 8, 8],
+        filename: 'Madrasa_Form.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { 
+            scale: 2, 
+            useCORS: true, 
+            logging: false,
+            scrollY: 0, // മൊബൈലിൽ സ്ക്രോൾ ചെയ്താലും ടോപ്പിൽ നിന്ന് തുടങ്ങാൻ
+            windowWidth: 750
+        },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] } // ഹൈറ്റ് കൂടുമ്പോൾ വരികൾ മുറിയാതിരിക്കാൻ
+    };
+
+    html2pdf().set(opt).from(element).save().then(() => {
+        element.style.display = 'none';
+        
+        const phoneNumber = "910000000000"; 
+        const message = "അപേക്ഷാ ഫോറം പൂരിപ്പിച്ചിട്ടുണ്ട്. PDF താഴെ അയക്കുന്നു.";
+        const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+        window.location.href = whatsappUrl;
+    });
+}
 </script>
 </body>
 </html>
