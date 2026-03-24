@@ -165,39 +165,7 @@
         document.getElementById('s'+n).classList.add('active'); 
     }
 
-    function downloadPDF() {
-        const ids = ['name_ml','name_en','gender','house','parent_main','guardian','phone','relation','job_addr','dob_num','dob_word','class','marks','prev_madrasa'];
-        ids.forEach(id => {
-            const val = document.getElementById('in_'+id).value;
-            document.getElementById('out_'+id).innerText = val ? val : " ";
-        });
-
-        const element = document.getElementById('pdf-content');
-        element.style.display = 'block';
-        
-        const opt = {
-            margin:       [8, 8, 8, 8],
-            filename:     'Madrasa_Admission_Form.pdf',
-            image:        { type: 'jpeg', quality: 1.0 },
-            html2canvas:  { 
-                scale: 2, 
-                useCORS: true,
-                width: 794, // A4 size pixel width - ഇത് മൊബൈലിൽ പകുതിയാകുന്നത് തടയും
-                windowWidth: 794 // ബ്രൗസർ വിൻഡോ വീതി ഫിക്സ് ചെയ്യുന്നു
-            },
-            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        };
-
-        html2pdf().set(opt).from(element).save().then(() => {
-            element.style.display = 'none';
-            
-            const phoneNumber = "919895993822"; 
-            const message = "അപേക്ഷാ ഫോറം പൂരിപ്പിച്ചിട്ടുണ്ട്. PDF താഴെ അയക്കുന്നു.";
-            const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-            
-            window.open(whatsappUrl, '_blank');
-        });
-    }
+    വീതി അല്ല hight ആണ് താഴെ പോയത് 
 </script>
 </body>
 </html>
