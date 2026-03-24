@@ -3,134 +3,99 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Madrasa Admission Form</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.41.0/html2canvas.min.js"></script>
+    <title>Admission Form</title>
+    <link href="https://fonts.googleapis.com/css2?family=Manjari:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 10px; }
-        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
+        body { font-family: 'Manjari', sans-serif; background-color: #f4f7f6; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .form-container { background: white; padding: 30px; border-radius: 15px; shadow: 0 4px 15px rgba(0,0,0,0.1); width: 90%; max-width: 400px; }
         .step { display: none; }
         .step.active { display: block; }
-        h2 { color: #27ae60; margin-bottom: 20px; }
-        input, select { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
-        button { background-color: #27ae60; color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-size: 16px; width: 100%; margin-top: 10px; font-weight: bold; }
-        button.secondary { background-color: #bdc3c7; }
-
-        /* ഫോട്ടോ ഡിസൈൻ - ഇത് സ്ക്രീനിൽ കാണില്ല */
-        #photoTemplate { 
-            position: absolute; left: -9999px; top: 0;
-            background: white; padding: 40px; width: 500px; border: 10px solid #27ae60; box-sizing: border-box;
-        }
-        .data-row { font-size: 22px; margin: 15px 0; border-bottom: 1px dashed #ccc; padding-bottom: 5px; text-align: left; }
+        h2 { text-align: center; color: #1a5f7a; }
+        input { width: 100%; padding: 12px; margin: 15px 0; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
+        button { background-color: #28a745; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-size: 16px; width: 100%; font-weight: bold; }
+        
+        /* PDF-ൽ കാണാൻ വേണ്ടിയുള്ള സ്റ്റൈൽ */
+        #displayArea { display: none; padding: 20px; border: 2px solid #000; }
+        .pdf-row { margin-bottom: 15px; font-size: 18px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <h2>അഡ്മിഷൻ ഫോം</h2>
-    
-    <form id="admissionForm">
+<div class="form-container">
+    <div id="inputForm">
+        <h2>അഡ്മിഷൻ ഫോം</h2>
+
         <div class="step active" id="step1">
-            <label>വിദ്യാർത്ഥിയുടെ പേര്:</label>
-            <input type="text" id="name" placeholder="Name" required>
-            <button type="button" onclick="nextStep(2)">അടുത്തത്</button>
+            <label>കുട്ടിയുടെ പേര്:</label>
+            <input type="text" id="studentName" placeholder="പേര് ടൈപ്പ് ചെയ്യുക">
+            <button onclick="nextStep(2)">Next</button>
         </div>
 
         <div class="step" id="step2">
             <label>രക്ഷിതാവിന്റെ പേര്:</label>
-            <input type="text" id="parent" placeholder="Parent Name" required>
-            <button type="button" onclick="nextStep(3)">അടുത്തത്</button>
-            <button type="button" class="secondary" onclick="nextStep(1)">പുറകോട്ട്</button>
+            <input type="text" id="parentName" placeholder="രക്ഷിതാവിന്റെ പേര്">
+            <button onclick="nextStep(3)">Next</button>
         </div>
 
         <div class="step" id="step3">
-            <label>ക്ലാസ്:</label>
-            <select id="grade">
-                <option>ഒന്നാം ക്ലാസ്</option>
-                <option>രണ്ടാം ക്ലാസ്</option>
-                <option>മൂന്നാം ക്ലാസ്</option>
-                <option>നാലാം ക്ലാസ്</option>
-                <option>അഞ്ചാം ക്ലാസ്</option>
-            </select>
-            <button type="button" onclick="nextStep(4)">അടുത്തത്</button>
-            <button type="button" class="secondary" onclick="nextStep(2)">പുറകോട്ട്</button>
-        </div>
-
-        <div class="step" id="step4">
             <label>ഫോൺ നമ്പർ:</label>
-            <input type="tel" id="phone" placeholder="WhatsApp Number" required>
-            <p style="font-size: 12px; color: gray;">സബ്മിറ്റ് ചെയ്യുമ്പോൾ ഫോട്ടോ ഡൗൺലോഡ് ആകുകയും WhatsApp ഓപ്പൺ ആവുകയും ചെയ്യും.</p>
-            <button type="button" id="submitBtn" onclick="generateImageAndSend()">Submit & Send</button>
-            <button type="button" class="secondary" onclick="nextStep(3)">പുറകോട്ട്</button>
+            <input type="tel" id="phoneNumber" placeholder="ഫോൺ നമ്പർ">
+            <button id="finishBtn" onclick="generatePDF()">Submit & WhatsApp</button>
         </div>
-    </form>
-</div>
+    </div>
 
-<div id="photoTemplate">
-    <h1 style="text-align: center; color: #27ae60; font-size: 32px; margin-bottom: 5px;">മദ്രസ അഡ്മിഷൻ</h1>
-    <p style="text-align: center; color: #666; margin-top: 0;">അധ്യയന വർഷം: 2026-27</p>
-    <hr style="border: 1px solid #27ae60;">
-    <div class="data-row"><b>പേര്:</b> <span id="pName"></span></div>
-    <div class="data-row"><b>രക്ഷിതാവ്:</b> <span id="pParent"></span></div>
-    <div class="data-row"><b>ക്ലാസ്:</b> <span id="pGrade"></span></div>
-    <div class="data-row"><b>ഫോൺ:</b> <span id="pPhone"></span></div>
-    <div class="data-row"><b>തീയതി:</b> <span id="pDate"></span></div>
-    <br>
-    <p style="text-align: center; font-size: 14px; color: #888;">ഈ ഫോട്ടോ ഗാലറിയിൽ നിന്ന് എനിക്ക് അയച്ചു തരൂ.</p>
+    <div id="displayArea">
+        <h2 style="text-align:center; color:#1a5f7a;">അഡ്മിഷൻ വിവരങ്ങൾ</h2>
+        <hr>
+        <div class="pdf-row"><b>കുട്ടിയുടെ പേര്:</b> <span id="pStudentName"></span></div>
+        <div class="pdf-row"><b>രക്ഷിതാവിന്റെ പേര്:</b> <span id="pParentName"></span></div>
+        <div class="pdf-row"><b>ഫോൺ നമ്പർ:</b> <span id="pPhoneNumber"></span></div>
+        <p style="text-align:center; font-size:12px; margin-top:50px;">ഈ ഫോം ഓൺലൈൻ വഴി പൂരിപ്പിച്ചതാണ്.</p>
+    </div>
 </div>
 
 <script>
     function nextStep(step) {
-        document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+        const current = document.querySelector('.step.active');
+        const input = current.querySelector('input');
+        if (input.value.trim() === "") { alert("ദയവായി പൂരിപ്പിക്കുക"); return; }
+        
+        current.classList.remove('active');
         document.getElementById('step' + step).classList.add('active');
     }
 
-    async function generateImageAndSend() {
-        const btn = document.getElementById('submitBtn');
-        btn.innerText = "Processing...";
-        btn.disabled = true;
+    function generatePDF() {
+        const sName = document.getElementById('studentName').value;
+        const pName = document.getElementById('parentName').value;
+        const phone = document.getElementById('phoneNumber').value;
 
-        const name = document.getElementById('name').value;
-        const parent = document.getElementById('parent').value;
-        const grade = document.getElementById('grade').value;
-        const phone = document.getElementById('phone').value;
+        if (phone.trim() === "") { alert("ഫോൺ നമ്പർ നൽകുക"); return; }
 
-        // വിവരങ്ങൾ ഫോട്ടോ ടെംപ്ലേറ്റിലേക്ക് മാറ്റുന്നു
-        document.getElementById('pName').innerText = name;
-        document.getElementById('pParent').innerText = parent;
-        document.getElementById('pGrade').innerText = grade;
-        document.getElementById('pPhone').innerText = phone;
-        document.getElementById('pDate').innerText = new Date().toLocaleDateString();
+        // ഇൻപുട്ട് വാല്യൂസ് PDF ഏരിയയിലേക്ക് മാറ്റുന്നു
+        document.getElementById('pStudentName').innerText = sName;
+        document.getElementById('pParentName').innerText = pName;
+        document.getElementById('pPhoneNumber').innerText = phone;
 
-        const element = document.getElementById('photoTemplate');
-        
-        try {
-            // 1. ഫോട്ടോ നിർമ്മിക്കുന്നു
-            const canvas = await html2canvas(element, { scale: 2 });
-            const image = canvas.toDataURL("image/png");
+        // PDF എടുക്കേണ്ട ഭാഗം കാണിക്കുന്നു
+        const element = document.getElementById('displayArea');
+        element.style.display = 'block';
 
-            // 2. ഫോട്ടോ ഡൗൺലോഡ് ചെയ്യുന്നു
-            const link = document.createElement('a');
-            const fileName = name.replace(/\s+/g, '_') + "_Admission_" + new Date().getTime() + ".png";
-            link.href = image;
-            link.download = fileName;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+        const opt = {
+            margin: 15,
+            filename: sName + '_Admission.pdf',
+            html2canvas: { scale: 2, useCORS: true },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
 
-            // 3. WhatsApp തുറക്കുന്നു
-            const myNumber = "919895993822"; 
-            const message = `*അഡ്മിഷൻ വിവരം*%0A--------------------------%0Aപേര്: ${name}%0Aക്ലാസ്: ${grade}%0A--------------------------%0Aഇപ്പോൾ ഡൗൺലോഡ് ആയ ഫോട്ടോ ഇങ്ങോട്ട് അയക്കുക.`;
+        html2pdf().set(opt).from(element).save().then(() => {
+            element.style.display = 'none'; // PDF എടുത്തു കഴിഞ്ഞാൽ വീണ്ടും മറയ്ക്കുന്നു
             
-            setTimeout(() => {
-                window.location.href = `https://wa.me/${myNumber}?text=${message}`;
-            }, 1200);
-
-        } catch (error) {
-            alert("Error: " + error);
-        } finally {
-            btn.innerText = "Submit & Send";
-            btn.disabled = false;
-        }
+            // വാട്സാപ്പിലേക്ക്
+            const myNumber = "919895993822"; // നിങ്ങളുടെ നമ്പർ ഇവിടെ മാറ്റുക
+            const msg = " അഡ്മിഷൻ ഫോം പൂരിപ്പിച്ചിട്ടുണ്ട്. PDF താഴെ അയക്കുന്നു.";
+            window.location.href = `https://wa.me/${myNumber}?text=${encodeURIComponent(msg)}`;
+        });
     }
 </script>
 
